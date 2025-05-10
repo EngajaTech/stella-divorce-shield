@@ -3,6 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 
 const Justice: React.FC = () => {
+  const scrollToContact = () => {
+    const contactElement = document.getElementById('contato');
+    contactElement?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section id="justica" className="section-padding bg-navy text-white">
       <div className="container mx-auto px-4">
@@ -18,7 +23,10 @@ const Justice: React.FC = () => {
             <p>Com estratégia, sensibilidade e coragem, é possível virar a página sem perder sua essência, seu patrimônio e sua paz.</p>
           </div>
           
-          <Button className="bg-gold hover:bg-gold/90 text-navy font-medium px-8 py-6 text-lg rounded-sm">
+          <Button 
+            onClick={scrollToContact} 
+            className="bg-gold hover:bg-gold/90 text-navy font-medium px-8 py-6 text-lg rounded-sm"
+          >
             Agendar Consulta Reservada
           </Button>
         </div>

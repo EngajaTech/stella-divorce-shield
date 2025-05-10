@@ -1,14 +1,49 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { Checkbox } from '@/components/ui/checkbox';
+
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  privacy: boolean;
+}
 
 const ContactForm: React.FC = () => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success("Sua mensagem foi enviada com sucesso! Entraremos em contato em breve.");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const form = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: '',
+      privacy: false,
+    }
+  });
+  
+  const handleSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success("Sua mensagem foi enviada com sucesso! Entraremos em contato em breve.");
+      form.reset();
+    } catch (error) {
+      toast.error("Ocorreu um erro ao enviar a mensagem. Por favor, tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -24,75 +59,139 @@ const ContactForm: React.FC = () => {
             </p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-sm shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-navy">Nome</label>
-                <Input 
-                  id="name" 
-                  type="text" 
-                  placeholder="Seu nome completo" 
-                  required 
-                  className="w-full border-gray-300 focus:border-gold focus:ring-gold"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 bg-white p-8 rounded-sm shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block mb-2 text-sm font-medium text-navy">Nome</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field}
+                          placeholder="Seu nome completo" 
+                          required 
+                          className="w-full border-gray-300 focus:border-gold focus:ring-gold"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block mb-2 text-sm font-medium text-navy">Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field}
+                          type="email" 
+                          placeholder="Seu email" 
+                          required 
+                          className="w-full border-gray-300 focus:border-gold focus:ring-gold"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-navy">Email</label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="Seu email" 
-                  required 
-                  className="w-full border-gray-300 focus:border-gold focus:ring-gold"
-                />
+              
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block mb-2 text-sm font-medium text-navy">Telefone</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field}
+                        type="tel" 
+                        placeholder="Seu telefone" 
+                        required 
+                        className="w-full border-gray-300 focus:border-gold focus:ring-gold"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block mb-2 text-sm font-medium text-navy">Assunto</FormLabel>
+                    <FormControl>
+                      <Input 
+                        {...field}
+                        placeholder="Assunto da consulta" 
+                        required 
+                        className="w-full border-gray-300 focus:border-gold focus:ring-gold"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="block mb-2 text-sm font-medium text-navy">Mensagem</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field}
+                        placeholder="Descreva brevemente sua situação" 
+                        rows={5} 
+                        required 
+                        className="w-full border-gray-300 focus:border-gold focus:ring-gold"
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500 mt-2">
+                      * Todas as informações compartilhadas são protegidas por sigilo profissional.
+                    </p>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="privacy"
+                render={({ field }) => (
+                  <FormItem className="flex items-start space-x-2">
+                    <FormControl>
+                      <Checkbox 
+                        checked={field.value} 
+                        onCheckedChange={field.onChange}
+                        id="privacy"
+                        required
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm text-gray-600">
+                        Concordo com a política de privacidade e termos de uso
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              
+              <div className="text-center">
+                <Button 
+                  type="submit" 
+                  className="bg-navy hover:bg-navy/90 text-white px-8 py-3 text-base"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Enviando..." : "Solicitar Contato"}
+                </Button>
               </div>
-            </div>
-            
-            <div>
-              <label htmlFor="phone" className="block mb-2 text-sm font-medium text-navy">Telefone</label>
-              <Input 
-                id="phone" 
-                type="tel" 
-                placeholder="Seu telefone" 
-                required 
-                className="w-full border-gray-300 focus:border-gold focus:ring-gold"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="subject" className="block mb-2 text-sm font-medium text-navy">Assunto</label>
-              <Input 
-                id="subject" 
-                type="text" 
-                placeholder="Assunto da consulta" 
-                required 
-                className="w-full border-gray-300 focus:border-gold focus:ring-gold"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="message" className="block mb-2 text-sm font-medium text-navy">Mensagem</label>
-              <Textarea 
-                id="message" 
-                placeholder="Descreva brevemente sua situação" 
-                rows={5} 
-                required 
-                className="w-full border-gray-300 focus:border-gold focus:ring-gold"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                * Todas as informações compartilhadas são protegidas por sigilo profissional.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <Button 
-                type="submit" 
-                className="bg-navy hover:bg-navy/90 text-white px-8 py-3 text-base"
-              >
-                Solicitar Contato
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </div>
       </div>
     </section>
